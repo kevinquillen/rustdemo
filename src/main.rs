@@ -1,6 +1,7 @@
 use structopt::StructOpt;
-use std::io::{prelude::*, BufReader};
+use std::io::{prelude::*, BufReader, Result};
 use std::fs::File;
+use std::path::PathBuf;
 
 #[derive(StructOpt)]
 struct Cli {
@@ -16,21 +17,30 @@ struct Cli {
         long = "filepath",
         help = "The directory to search for the pattern given.",
     )]
-    path: std::path::PathBuf
+    path: PathBuf
 }
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<()> {
     let args = Cli::from_args();
     let file = File::open(args.path).expect("\n\nCould not read from file!");
     let reader = BufReader::new(file); 
+    let mut line_number: i32 = 1;
+    let mut found = false;
 
     for line in reader.lines() {
         let line = line.unwrap();
         if line.contains(&args.pattern) {
-            println!("\nFound text:\n\n{}", line.trim());
+            found = true;
             break;
         }
+        line_number = line_number + 1;
     }
 
+    let result = match found {
+        false => String::from(format!("Text \"{}\" not found.", args.pattern)),
+        true => String::from(format!("Found text on line #{}.", line_number)),
+    };
+
+    println!("\n\n{}", result);
     Ok(())
 }

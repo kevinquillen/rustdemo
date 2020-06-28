@@ -29,16 +29,18 @@ fn main() -> Result<()> {
 
     for line in reader.lines() {
         let line = line.unwrap();
+
         if line.contains(&args.pattern) {
             found = true;
             break;
         }
+        
         line_number = line_number + 1;
     }
 
     let result = match found {
         false => String::from(format!("Text \"{}\" not found.", args.pattern)),
-        true => String::from(format!("Found text on line #{}.", line_number)),
+        true => String::from(format!("Found text \"{}\" on line #{}.", args.pattern, line_number)),
     };
 
     println!("\n\n{}", result);

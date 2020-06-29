@@ -2,6 +2,7 @@ use structopt::StructOpt;
 use std::io::{prelude::*, BufReader, Result};
 use std::fs::File;
 use std::path::PathBuf;
+use regex::Regex;
 
 #[derive(StructOpt)]
 struct CommandOptions {
@@ -48,7 +49,7 @@ fn main() -> Result<()> {
 }
 
 fn find_match(content: String, pattern: &str) -> bool {
-    return content.to_lowercase().contains(pattern);
+    return Regex::new(format!(r#"(?i){}"#, pattern).as_str()).unwrap().is_match(&content.as_str());
 }
 
 #[cfg(test)]
@@ -57,16 +58,20 @@ mod tests {
 
     #[test]
     fn test_find_match() {
-        let content = String::from("Hello there");
+        let content = String::from("Hello there.");
         let pattern = "there";
         assert_eq!(true, find_match(content, pattern));
 
         let content = String::from("Goodbye!");
-        let pattern = "there";
-        assert_eq!(false, find_match(content, pattern));
+        let pattern = "GOOD";
+        assert_eq!(true, find_match(content, pattern));
 
-        let content = String::from("ParTiAL");
+        let content = String::from("I am a ParTiAL mixed case");
         let pattern = "part";
         assert_eq!(true, find_match(content, pattern));
+
+        let content = String::from("good bye");
+        let pattern = "hello";
+        assert_eq!(false, find_match(content, pattern));
     }
 }

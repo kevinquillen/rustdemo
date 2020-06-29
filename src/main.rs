@@ -4,7 +4,7 @@ use std::fs::File;
 use std::path::PathBuf;
 
 #[derive(StructOpt)]
-struct Cli {
+struct CommandOptions {
     #[structopt(
         short = "p", 
         long = "pattern",
@@ -21,7 +21,7 @@ struct Cli {
 }
 
 fn main() -> Result<()> {
-    let args = Cli::from_args();
+    let args = CommandOptions::from_args();
     let file = File::open(args.path).expect("\n\nCould not read from file!");
     let reader = BufReader::new(file); 
     let mut line_number: i32 = 1;
@@ -29,8 +29,8 @@ fn main() -> Result<()> {
 
     for line in reader.lines() {
         let line = line.unwrap();
-
-        if line.contains(&args.pattern) {
+    
+        if find_match(line, &args.pattern) {
             found = true;
             break;
         }
@@ -45,4 +45,28 @@ fn main() -> Result<()> {
 
     println!("\n\n{}", result);
     Ok(())
+}
+
+fn find_match(content: String, pattern: &str) -> bool {
+    return content.to_lowercase().contains(pattern);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_find_match() {
+        let content = String::from("Hello there");
+        let pattern = "there";
+        assert_eq!(true, find_match(content, pattern));
+
+        let content = String::from("Goodbye!");
+        let pattern = "there";
+        assert_eq!(false, find_match(content, pattern));
+
+        let content = String::from("ParTiAL");
+        let pattern = "part";
+        assert_eq!(true, find_match(content, pattern));
+    }
 }

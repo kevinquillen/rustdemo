@@ -1,8 +1,9 @@
 use structopt::StructOpt;
-use std::io::{prelude::*, BufReader, Result};
+use std::io::{prelude::*, BufReader};
 use std::fs::File;
 use std::path::PathBuf;
-use regex::Regex;
+
+mod find_match;
 
 #[derive(StructOpt)]
 struct CommandOptions {
@@ -21,17 +22,18 @@ struct CommandOptions {
     path: PathBuf
 }
 
-fn main() -> Result<()> {
+fn main() {
     let args = CommandOptions::from_args();
     let file = File::open(args.path).expect("\n\nCould not read from file!");
     let reader = BufReader::new(file); 
-    let mut line_number: i32 = 1;
+    let mut line_number = 1;
     let mut found = false;
 
     for line in reader.lines() {
         let line = line.unwrap();
-    
-        if find_match(line, &args.pattern) {
+        
+        // @todo: accumulate line number and concat for result output instead of just stopping.
+        if find_match::find_match(line, &args.pattern) {
             found = true;
             break;
         }
@@ -39,39 +41,8 @@ fn main() -> Result<()> {
         line_number = line_number + 1;
     }
 
-    let result = match found {
-        false => String::from(format!("Text \"{}\" not found.", args.pattern)),
-        true => String::from(format!("Found text \"{}\" on line #{}.", args.pattern, line_number)),
+    match found {
+        false => println!("Text \"{}\" not found.", args.pattern),
+        true => println!("Found text \"{}\" on line #{}.", args.pattern, line_number),
     };
-
-    println!("\n\n{}", result);
-    Ok(())
-}
-
-fn find_match(content: String, pattern: &str) -> bool {
-    return Regex::new(format!(r#"(?i){}"#, pattern).as_str()).unwrap().is_match(&content.as_str());
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_find_match() {
-        let content = String::from("Hello there.");
-        let pattern = "there";
-        assert_eq!(true, find_match(content, pattern));
-
-        let content = String::from("Goodbye!");
-        let pattern = "GOOD";
-        assert_eq!(true, find_match(content, pattern));
-
-        let content = String::from("I am a ParTiAL mixed case");
-        let pattern = "part";
-        assert_eq!(true, find_match(content, pattern));
-
-        let content = String::from("good bye");
-        let pattern = "hello";
-        assert_eq!(false, find_match(content, pattern));
-    }
 }

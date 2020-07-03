@@ -24,7 +24,7 @@ struct CommandOptions {
 
 fn main() {
     let args = CommandOptions::from_args();
-    let file = File::open(args.path).expect("\n\nCould not read from file!");
+    let file = File::open(&args.path).expect("\n\nCould not read from file!");
     let reader = BufReader::new(file);
     let mut hits = Vec::new();
     let mut line_number = 1;
@@ -38,9 +38,9 @@ fn main() {
     }
 
     match hits.len() > 0 {
-        false => println!("Text \"{}\" not found.", args.pattern),
+        false => println!("Text \"{}\" not found in {:?}.", args.pattern, args.path),
         true => {
-            println!("Found {} matches: ", hits.len());
+            println!("\nFound {} matches: ", hits.len());
 
             for line in &hits {
                 println!(" - Found a match on line #{}.", line)

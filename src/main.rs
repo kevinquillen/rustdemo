@@ -25,24 +25,26 @@ struct CommandOptions {
 fn main() {
     let args = CommandOptions::from_args();
     let file = File::open(args.path).expect("\n\nCould not read from file!");
-    let reader = BufReader::new(file); 
+    let reader = BufReader::new(file);
+    let mut hits = Vec::new();
     let mut line_number = 1;
-    let mut found = false;
 
     for line in reader.lines() {
-        let line = line.unwrap();
-        
-        // @todo: accumulate line number and concat for result output instead of just stopping.
-        if find_match::find_match(line, &args.pattern) {
-            found = true;
-            break;
+        if find_match::find_match(line.unwrap(), &args.pattern) {
+            hits.push(line_number);
         }
         
         line_number = line_number + 1;
     }
 
-    match found {
+    match hits.len() > 0 {
         false => println!("Text \"{}\" not found.", args.pattern),
-        true => println!("Found text \"{}\" on line #{}.", args.pattern, line_number),
+        true => {
+            println!("Found {} matches: ", hits.len());
+
+            for line in &hits {
+                println!(" - Found a match on line #{}.", line)
+            }
+        },
     };
 }

@@ -28,18 +28,31 @@ pub fn find_string(content: String, pattern: &str) -> bool {
 pub fn find_matches(pattern: &String, path: &PathBuf) -> Vec<i32> {
     let file = File::open(path).expect("\n\nCould not read from file!");
     let reader = BufReader::new(file);
-    let mut hits = Vec::new();
+    let mut matches = Vec::new();
     let mut line_number = 1;
 
     for line in reader.lines() {
         if find_string(line.unwrap(), pattern) {
-            hits.push(line_number);
+            matches.push(line_number);
         }
 
         line_number = line_number + 1;
     }
 
-    hits
+    matches
+}
+
+pub fn output_matches(matches: Vec<i32>, pattern: &String, path: &PathBuf) {
+    match matches.len() > 0 {
+        false => println!("Text \"{}\" not found in {:?}.", pattern, path),
+        true => {
+            println!("\nFound {} matches: ", matches.len());
+
+            for line in &matches {
+                println!(" - Found a match on line #{}.", line)
+            }
+        },
+    };
 }
 
 #[cfg(test)]

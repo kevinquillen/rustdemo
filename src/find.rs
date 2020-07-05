@@ -21,7 +21,7 @@ pub struct FindText {
     pub path: PathBuf
 }
 
-pub fn find_string(content: String, pattern: &str) -> bool {
+fn find_string(content: String, pattern: &str) -> bool {
     return Regex::new(format!(r#"(?i){}"#, pattern).as_str()).unwrap().is_match(&content.as_str());
 }
 

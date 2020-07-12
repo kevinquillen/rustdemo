@@ -7,16 +7,16 @@ use std::path::PathBuf;
 #[derive(StructOpt)]
 pub struct FindText {
     #[structopt(
-        short = "p",
-        long = "pattern",
+        short = "t",
+        long = "text",
         help = "The text you want to look for.",
     )]
     pub text: String,
 
     #[structopt(
         short = "f",
-        long = "filepath",
-        help = "The directory to search for the pattern given.",
+        long = "file",
+        help = "The file to search for the given text.",
     )]
     pub path: PathBuf
 }

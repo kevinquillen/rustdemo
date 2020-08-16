@@ -61,6 +61,16 @@ mod tests {
     fn test_find_matches() {
         let fixture = "fixtures/example.txt";
 
+        let find = Find { text: String::from("HELLO THERE!"), path: PathBuf::from(fixture) };
+        let matches = find.find_matches();
+        assert_eq!(1, matches.len());
+        assert_eq!(true, matches.contains(&1));
+
+        let find = Find { text: String::from("nothing to find"), path: PathBuf::from(fixture) };
+        let matches = find.find_matches();
+        assert_eq!(0, matches.len());
+        assert_eq!(true, matches.is_empty());
+
         let find = Find { text: String::from("Hello there!"), path: PathBuf::from(fixture) };
         let matches = find.find_matches();
         assert_eq!(1, matches.len());

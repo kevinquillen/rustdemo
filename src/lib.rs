@@ -39,18 +39,6 @@ impl Find {
 
         matches
     }
-
-    pub fn list_matches(&self, matches: Vec<i32>) {
-        if matches.is_empty() {
-            println!("No matches found.");
-        } else {
-            println!("\nFound {} matches: ", matches.len());
-
-            for line in &matches {
-                println!(" - Found a match on line #{}.", line)
-            }
-        }
-    }
 }
 
 #[cfg(test)]
